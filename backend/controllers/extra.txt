@@ -1,0 +1,96 @@
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "🔐 Verify Your Account - Your OTP Code",
+    html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                /* Include all the CSS from above */
+                body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+                .container { max-width: 500px; width: 100%; }
+                .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; padding: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); text-align: center; position: relative; overflow: hidden; }
+                .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #8b5cf6, #ec4899, #3b82f6); }
+                .logo { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 30px; }
+                .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #8b5cf6, #ec4899); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; }
+                .logo-text { font-size: 28px; font-weight: 900; background: linear-gradient(135deg, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+                .title { font-size: 32px; font-weight: 800; color: #1f2937; margin-bottom: 16px; line-height: 1.2; }
+                .subtitle { color: #6b7280; font-size: 16px; line-height: 1.6; margin-bottom: 8px; }
+                .highlight { color: #8b5cf6; font-weight: 600; }
+                .otp-code { background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; padding: 20px 30px; border-radius: 16px; font-size: 32px; font-weight: 800; letter-spacing: 8px; margin: 30px 0; box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); }
+                .timer { font-size: 18px; font-weight: 600; color: #ef4444; margin: 20px 0; padding: 12px 24px; background: rgba(239, 68, 68, 0.1); border-radius: 12px; display: inline-block; }
+                .info-box { background: rgba(139, 92, 246, 0.05); border: 1px solid rgba(139, 92, 246, 0.1); border-radius: 16px; padding: 20px; margin: 30px 0; text-align: left; }
+                .steps { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+                .step { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255, 255, 255, 0.5); border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.05); }
+                .step-number { width: 32px; height: 32px; background: linear-gradient(135deg, #8b5cf6, #ec4899); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; }
+                .security-note { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 16px; margin: 20px 0; text-align: center; }
+                .footer { margin-top: 40px; padding-top: 30px; border-top: 1px solid #e5e7eb; color: #9ca3af; font-size: 14px; }
+                @media (max-width: 480px) { .card { padding: 30px 20px; } .title { font-size: 24px; } .otp-code { font-size: 24px; padding: 16px 20px; letter-spacing: 6px; } }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="card">
+                    <div class="logo">
+                        <div class="logo-icon">S</div>
+                        <div class="logo-text">${user.firstName} ${
+      user.lastName
+    }</div>
+                    </div>
+                    
+                    <h1 class="title">Verify Your Account</h1>
+                    <p class="subtitle">Enter the 6-digit verification code sent to</p>
+                    <p class="subtitle highlight">${email}</p>
+                    
+                    <div class="otp-code">${user.otp}</div>
+                    
+                    <div class="timer">
+                        ⏰ Code expires in: 10:00
+                    </div>
+                    
+                    <div class="info-box">
+                        <div style="font-weight: 600; color: #8b5cf6; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">🔒 Security Verification</div>
+                        <p>This code confirms your identity and protects your account. Please enter it in the verification page to complete your registration.</p>
+                    </div>
+                    
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <span>Copy the 6-digit code above</span>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <span>Return to the verification page</span>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <span>Enter the code to complete verification</span>
+                        </div>
+                    </div>
+                    
+                    <div class="security-note">
+                        <div style="font-size: 24px; margin-bottom: 8px;">🛡️</div>
+                        <strong>Security Tip:</strong> Never share this code with anyone. Our team will never ask for your verification code.
+                    </div>
+                    
+                    <div style="margin: 30px 0;">
+                        <a href="#" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; border: none; padding: 16px 32px; border-radius: 16px; font-size: 16px; font-weight: 600; text-decoration: none; display: inline-block; box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.4);">Verify My Account</a>
+                    </div>
+                    
+                    <p class="subtitle" style="margin-bottom: 20px;">
+                        Didn't receive the code? 
+                        <a href="#" style="color: #8b5cf6; text-decoration: none; font-weight: 600;">Resend Code</a>
+                    </p>
+                    
+                    <div class="footer">
+                        <p>This verification code will expire in 10 minutes for security reasons.</p>
+                        <p>If you didn't request this code, please ignore this email or contact support if you have concerns.</p>
+                        <p style="margin-top: 20px;">© ${new Date().getFullYear()} ShopHub. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+    `,
+  };

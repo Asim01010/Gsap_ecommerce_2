@@ -1,0 +1,51 @@
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { addPost } from "./postService";
+
+const initialState = {
+  posts: [],
+  postLoading: false,
+  postError: false,
+  postSuccess: false,
+  postMessage: "",
+};
+
+export const createPost = createAsyncThunk(
+  "posts/createPost",
+  async (postData, thunkAPI) => {
+    try {
+      return await addPost(postData);
+    } catch (error) {
+      thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const postSlice = createSlice({
+  name: "posts",
+  initialState,
+  reducers: {
+    postReset: (state) => {
+      state.postLoading = false;
+      state.postError = false;
+      state.postSuccess = false;
+      state.postMessage = "";
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(createPost.pending, (state) => {
+      state.postLoading = true;
+    });
+    builder.addCase(createPost.fulfilled, (state, action) => {
+      state.postLoading = false;
+      state.postSuccess = true;
+      state.posts.push(action.payload);
+    });
+    builder.addCase(createPost.rejected, (state, action) => {
+      state.postLoading = false;
+      state.postError = true;
+      state.postMessage = action.payload;
+    });
+  },
+});
+export const { postReset } = postSlice.actions;
+export default postSlice.reducer;
