@@ -22,12 +22,12 @@ const Navbar = () => {
   const navItems = [
     { path: "/home", label: "Home", icon: "🏠" },
     { path: "/all-products", label: "Products", icon: "📦" },
-    // { path: "/categories", label: "Categories", icon: "📊" },
+    { path: "/categories", label: "Categories", icon: "📊" },
     { path: "/deals", label: "Deals", icon: "🔥" },
-    // { path: "/trending", label: "Trending", icon: "🚀" },
+    { path: "/trending", label: "Trending", icon: "🚀" },
     { path: "/blog", label: "Blog", icon: "📝" },
-    // { path: "/cart", label: "Cart", icon: "🛒" },
-    // { path: "/user-profile", label: "Profile", icon: "👤" },
+    { path: "/cart", label: "Cart", icon: "🛒" },
+    { path: "/user-profile", label: "Profile", icon: "👤" },
     { path: "/product-feed", label: "Social", icon: "🎃" },
   ];
 

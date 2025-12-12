@@ -2,16 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import AddPost from "./components/AddPost";
+import GetPost from "./components/GetPost";
 gsap.registerPlugin(ScrollTrigger);
 
 const SocialProductFeed = () => {
   const [posts, setPosts] = useState([]);
-  const [newPost, setNewPost] = useState({
-    image: "",
-    description: "",
-    price: "",
-    productName: "",
-  });
   const [comments, setComments] = useState({});
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(true); // Toggle this to see different views
@@ -19,7 +14,7 @@ const SocialProductFeed = () => {
   // Refs for animations
   const pageRef = useRef(null);
   const headerRef = useRef(null);
-  const createPostRef = useRef(null);
+
   const postRefs = useRef([]);
   const commentRefs = useRef([]);
 
@@ -169,14 +164,6 @@ const SocialProductFeed = () => {
     );
 
     // Create post animation (only for admin)
-    if (isAdmin) {
-      masterTl.fromTo(
-        createPostRef.current,
-        { scale: 0.8, opacity: 0, y: 50 },
-        { scale: 1, opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.7)" },
-        "-=0.5"
-      );
-    }
 
     // Posts staggered animation
     masterTl.fromTo(
@@ -245,43 +232,39 @@ const SocialProductFeed = () => {
     });
   }, [loading, isAdmin]);
 
-  const handleCreatePost = (e) => {
-    e.preventDefault();
-    if (!newPost.productName || !newPost.description) return;
+  // const handleCreatePost = (e) => {
+  //   e.preventDefault();
+  //   if (!newPost.productName || !newPost.description) return;
 
-    const post = {
-      id: posts.length + 1,
-      user: {
-        name: "You",
-        avatar: "👑",
-        role: "Admin",
-        verified: true,
-      },
-      product: {
-        name: newPost.productName,
-        price: newPost.price || "$0.00",
-        image: newPost.image || "📦",
-        category: "New Product",
-      },
-      description: newPost.description,
-      timestamp: "Just now",
-      likes: 0,
-      shares: 0,
-      comments: 0,
-      isLiked: false,
-      isShared: false,
-    };
+  //   const post = {
+  //     id: posts.length + 1,
+  //     user: {
+  //       name: "You",
+  //       avatar: "👑",
+  //       role: "Admin",
+  //       verified: true,
+  //     },
+  //     product: {
+  //       category: "New Product",
+  //     },
+  //     timestamp: "Just now",
+  //     likes: 0,
+  //     shares: 0,
+  //     comments: 0,
+  //     isLiked: false,
+  //     isShared: false,
+  //   };
 
-    setPosts([post, ...posts]);
-    setNewPost({ image: "", description: "", price: "", productName: "" });
+  //   setPosts([post, ...posts]);
+  //   // setNewPost({ image: "", description: "", price: "", productName: "" });
 
-    // Success animation
-    gsap.fromTo(
-      postRefs.current[0],
-      { scale: 0.5, opacity: 0, rotationY: 180 },
-      { scale: 1, opacity: 1, rotationY: 0, duration: 1, ease: "back.out(1.7)" }
-    );
-  };
+  //   // Success animation
+  //   gsap.fromTo(
+  //     postRefs.current[0],
+  //     { scale: 0.5, opacity: 0, rotationY: 180 },
+  //     { scale: 1, opacity: 1, rotationY: 0, duration: 1, ease: "back.out(1.7)" }
+  //   );
+  // };
 
   const handleLike = (postId) => {
     setPosts(
@@ -370,86 +353,6 @@ const SocialProductFeed = () => {
     }
   };
 
-  const CreatePostForm = () => (
-    <div
-      ref={createPostRef}
-      className="bg-white/80 backdrop-blur-lg rounded-3xl p-6 shadow-xl border border-white/20 mb-8"
-    >
-      <h3 className="text-xl font-black bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
-        Create Product Post
-      </h3>
-      <form onSubmit={handleCreatePost} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Product Name
-            </label>
-            <input
-              type="text"
-              value={newPost.productName}
-              onChange={(e) =>
-                setNewPost({ ...newPost, productName: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all duration-200"
-              placeholder="Enter product name"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Price
-            </label>
-            <input
-              type="text"
-              value={newPost.price}
-              onChange={(e) =>
-                setNewPost({ ...newPost, price: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all duration-200"
-              placeholder="$0.00"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Product Image (Emoji)
-          </label>
-          <input
-            type="text"
-            value={newPost.image}
-            onChange={(e) => setNewPost({ ...newPost, image: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all duration-200"
-            placeholder="📱 (emoji)"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Description
-          </label>
-          <textarea
-            value={newPost.description}
-            onChange={(e) =>
-              setNewPost({ ...newPost, description: e.target.value })
-            }
-            rows="3"
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all duration-200 resize-none"
-            placeholder="Share something about this product..."
-          />
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200 interactive"
-          >
-            Post Product
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-
   const Post = ({ post }) => {
     const [showComments, setShowComments] = useState(false);
     const [commentText, setCommentText] = useState("");
@@ -461,169 +364,19 @@ const SocialProductFeed = () => {
     };
 
     return (
-      <div
-        ref={addToPostRefs}
-        className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-white/20 interactive group mb-8"
-      >
-        {/* Post Header */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center text-white text-xl">
-              {post.user.avatar}
-            </div>
-            <div className="flex-grow">
-              <div className="flex items-center space-x-2">
-                <h4 className="font-bold text-gray-800">{post.user.name}</h4>
-                {post.user.verified && (
-                  <span className="text-blue-500" title="Verified">
-                    ✓
-                  </span>
-                )}
-                <span className="px-2 py-1 bg-purple-100 text-purple-600 text-xs font-bold rounded-full">
-                  {post.user.role}
-                </span>
-              </div>
-              <p className="text-sm text-gray-500">{post.timestamp}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Post Content */}
-        <div className="p-6">
-          <p className="text-gray-800 mb-4 text-lg">{post.description}</p>
-
-          {/* Product Card */}
-          <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-4 mb-4 interactive">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-200 to-blue-200 rounded-2xl flex items-center justify-center text-2xl">
-                {post.product.image}
-              </div>
-              <div className="flex-grow">
-                <h5 className="font-bold text-gray-800 text-lg">
-                  {post.product.name}
-                </h5>
-                <p className="text-purple-600 font-semibold">
-                  {post.product.price}
-                </p>
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                  {post.product.category}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Engagement Stats */}
-        <div className="px-6 py-3 border-t border-b border-gray-200">
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <div className="flex items-center space-x-4">
-              <span>{post.likes} likes</span>
-              <span>{post.comments} comments</span>
-              <span>{post.shares} shares</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="p-4 grid grid-cols-3 gap-2">
-          <button
-            onClick={() => handleLike(post.id)}
-            className={`flex items-center justify-center space-x-2 py-3 rounded-xl transition-all duration-200 interactive like-button ${
-              post.isLiked
-                ? "bg-red-50 text-red-600"
-                : "hover:bg-gray-100 text-gray-600"
-            }`}
-          >
-            <span className="text-xl">{post.isLiked ? "❤️" : "🤍"}</span>
-            <span className="font-semibold">Like</span>
-          </button>
-
-          <button
-            onClick={() => setShowComments(!showComments)}
-            className="flex items-center justify-center space-x-2 py-3 rounded-xl hover:bg-gray-100 text-gray-600 transition-all duration-200 interactive"
-          >
-            <span className="text-xl">💬</span>
-            <span className="font-semibold">Comment</span>
-          </button>
-
-          <button
-            onClick={() => handleShare(post.id)}
-            className={`flex items-center justify-center space-x-2 py-3 rounded-xl transition-all duration-200 interactive ${
-              post.isShared
-                ? "bg-green-50 text-green-600"
-                : "hover:bg-gray-100 text-gray-600"
-            }`}
-          >
-            <span className="text-xl">🔄</span>
-            <span className="font-semibold">Share</span>
-          </button>
-        </div>
-
-        {/* Comments Section */}
-        {showComments && (
-          <div className="border-t border-gray-200 p-6">
-            {/* Add Comment */}
-            <form onSubmit={handleCommentSubmit} className="mb-6">
-              <div className="flex space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                  👤
-                </div>
-                <div className="flex-grow">
-                  <input
-                    type="text"
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all duration-200"
-                    placeholder="Write a comment..."
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="px-4 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors duration-200 interactive"
-                >
-                  Post
-                </button>
-              </div>
-            </form>
-
-            {/* Comments List */}
-            <div id={`comments-${post.id}`} className="space-y-4">
-              {(comments[post.id] || []).map((comment, index) => (
-                <div
-                  key={comment.id}
-                  ref={addToCommentRefs}
-                  className="flex space-x-3 interactive group"
-                >
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-blue-400 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                    {comment.user.avatar}
-                  </div>
-                  <div className="flex-grow">
-                    <div className="bg-gray-50 rounded-2xl p-4">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <span className="font-semibold text-gray-800">
-                          {comment.user.name}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {comment.timestamp}
-                        </span>
-                      </div>
-                      <p className="text-gray-700">{comment.text}</p>
-                    </div>
-                    <div className="flex items-center space-x-4 mt-2 px-2">
-                      <button className="text-sm text-gray-500 hover:text-gray-700 interactive">
-                        Like ({comment.likes})
-                      </button>
-                      <button className="text-sm text-gray-500 hover:text-gray-700 interactive">
-                        Reply
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      <GetPost
+        post={post}
+        showComments={showComments}
+        setShowComments={setShowComments}
+        commentText={commentText}
+        setCommentText={setCommentText}
+        handleCommentSubmit={handleCommentSubmit}
+        addToPostRefs={addToPostRefs}
+        handleLike={handleLike}
+        handleShare={handleShare}
+        addToCommentRefs={addToCommentRefs}
+        comments={comments}
+      />
     );
   };
 
@@ -676,7 +429,7 @@ const SocialProductFeed = () => {
         </div>
 
         {/* Create Post Form (Admin Only) */}
-        {isAdmin && <CreatePostForm />}
+        {/* {isAdmin && <CreatePostForm />} */}
 
         {/* Posts Feed */}
         <div className="space-y-6">

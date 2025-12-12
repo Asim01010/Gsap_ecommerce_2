@@ -1,9 +1,12 @@
-import { useState, useRef, useEffect, use } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ArrowLeft, ChevronLeft, Smile, User, X } from "lucide-react";
 import { colorData } from "../data/color-data";
 import gsap from "gsap";
 import { imageExpo } from "../data/decorative";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { createPost, postReset } from "../../../../features/Post/postSlice";
+import CircularProgress from "@mui/material/CircularProgress";
+import { toast } from "react-hot-toast";
 const AddPostBox = ({ handleClose }) => {
   const [openColor, setOpenColor] = useState(false);
   const [showBackgroundModal, setShowBackgroundModal] = useState(false);
@@ -12,6 +15,7 @@ const AddPostBox = ({ handleClose }) => {
     endColor: "#ffffff",
     image: "",
   });
+
   const [changeRow, setChangeRow] = useState(false);
 
   const { startColor, endColor } = selectedColor;
@@ -139,12 +143,49 @@ const AddPostBox = ({ handleClose }) => {
     setShowBackgroundModal(false);
     setOpenColor(false);
   };
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const { user } = useSelector((state) => state.register);
+  const { posts, postLoading, postError, postSuccess, postMessage } =
+    useSelector((state) => state.post);
+  const dispatch = useDispatch();
   const handlePostUpload = (e) => {
     e.preventDefault();
-    // Logic to handle post upload goes here
+
+    const postData = {
+      text: text,
+      background: {
+        startColor: selectedColor.startColor,
+        endColor: selectedColor.endColor,
+        image: selectedColor.image,
+      },
+      user_id: user?._id,
+    };
+
+    dispatch(createPost(postData));
+    console.log("POST DATA:", postData);
+
+    // Example: send to backend (Node/MongoDB)
+    // axios.post("/api/post/create", postData)
+    //   .then(res => console.log("Post saved"))
+    //   .catch(err => console.log(err));
   };
+  useEffect(() => {
+    if (postError) {
+      toast.error(postMessage);
+    }
+    if (postSuccess) {
+      toast.success("Post created successfully!");
+      setText("");
+      setSelectedColor({
+        startColor: "#ffffff",
+        endColor: "#ffffff",
+        image: "",
+      });
+      setChangeRow(false);
+      handleClose();
+    }
+    dispatch(postReset());
+  }, [postError, postSuccess, postMessage]);
 
   return (
     <>
@@ -228,7 +269,7 @@ const AddPostBox = ({ handleClose }) => {
                 backgroundImage: `linear-gradient(135deg, purple, blue)`,
               }}
             >
-              What's on your mind {user?.lastname || "User"}?
+              What's on your mind {user?.lastName || "User"}?
             </p>
           )}
 
@@ -317,7 +358,32 @@ const AddPostBox = ({ handleClose }) => {
     }
   `}
               >
-                Here You Can Post
+                {postLoading ? (
+                  <>
+                    <svg width={0} height={0}>
+                      <defs>
+                        <linearGradient
+                          id="myGradient"
+                          x1="0%"
+                          y1="0%"
+                          x2="0%"
+                          y2="100%"
+                        >
+                          <stop offset="0%" stopColor="#e01cd5" />
+                          <stop offset="100%" stopColor="#1CB5E0" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+
+                    <CircularProgress
+                      size={40}
+                      thickness={4}
+                      sx={{ "svg circle": { stroke: "url(#myGradient)" } }}
+                    />
+                  </>
+                ) : (
+                  <>POST HERE</>
+                )}
               </button>
             </div>
           </div>
