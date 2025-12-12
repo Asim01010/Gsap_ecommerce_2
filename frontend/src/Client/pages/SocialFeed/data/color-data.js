@@ -9,12 +9,12 @@ export const colorData = [
   { id: 8, startColor: "#d299c2", endColor: "#fef9d7", color: "#764ba2" }, // Lavender → cream
   {
     id: 9,
-    image:
+    backgroundImage:
       "https://media.istockphoto.com/id/1623303770/photo/creative-background-image-is-blurred-evening-city-lights-and-light-snowfall.webp?b=1&s=612x612&w=0&k=20&c=--I6QisPR7yGmgujOI2co8U3FIK5tBv6xAjMup67ghc=",
   }, // Aqua → bright blue
   {
     id: 10,
-    image:
+    backgroundImage:
       "https://icons.veryicon.com/png/o/miscellaneous/decon/dashboard-76.png",
   }, // Warm white → peach
 ];

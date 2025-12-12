@@ -13,7 +13,7 @@ const AddPostBox = ({ handleClose }) => {
   const [selectedColor, setSelectedColor] = useState({
     startColor: "#ffffff",
     endColor: "#ffffff",
-    image: "",
+    backgroundImage: "",
   });
 
   const [changeRow, setChangeRow] = useState(false);
@@ -94,7 +94,7 @@ const AddPostBox = ({ handleClose }) => {
     }
   }, [showBackgroundModal]);
 
-  useEffect(() => {});
+  // useEffect(() => {});
   // Handle color selection
   const handleColorSelect = (item, index) => {
     // If it's the last button (index 9), open background modal
@@ -105,7 +105,7 @@ const AddPostBox = ({ handleClose }) => {
       const newColor = {
         startColor: item?.startColor || "#ffffff",
         endColor: item?.endColor || "#ffffff",
-        image: item?.image || "",
+        backgroundImage: item?.backgroundImage || "",
       };
 
       // Index 0 is white, so keep textarea small
@@ -121,7 +121,7 @@ const AddPostBox = ({ handleClose }) => {
     let newColor = {
       startColor: "",
       endColor: "",
-      image: "",
+      backgroundImage: "",
     };
 
     if (item.type === "gradient") {
@@ -134,7 +134,7 @@ const AddPostBox = ({ handleClose }) => {
       newColor.startColor = item.color;
       newColor.endColor = item.color;
     } else if (item.type === "dummy") {
-      newColor.image = item.url;
+      newColor.backgroundImage = item.url;
     }
 
     // All backgrounds from modal make textarea bigger
@@ -156,7 +156,7 @@ const AddPostBox = ({ handleClose }) => {
       background: {
         startColor: selectedColor.startColor,
         endColor: selectedColor.endColor,
-        image: selectedColor.image,
+        backgroundImage: selectedColor.backgroundImage,
       },
       user_id: user?._id,
     };
@@ -179,13 +179,16 @@ const AddPostBox = ({ handleClose }) => {
       setSelectedColor({
         startColor: "#ffffff",
         endColor: "#ffffff",
-        image: "",
+        backgroundImage: "",
       });
       setChangeRow(false);
       handleClose();
     }
-    dispatch(postReset());
-  }, [postError, postSuccess, postMessage]);
+
+    return () => {
+      dispatch(postReset());
+    };
+  }, [postError, postSuccess, postMessage, dispatch]);
 
   return (
     <>
@@ -239,8 +242,8 @@ const AddPostBox = ({ handleClose }) => {
             style={{
               resize: "none",
               width: "100%",
-              background: selectedColor.image
-                ? `url(${selectedColor.image}) center/cover no-repeat`
+              background: selectedColor.backgroundImage
+                ? `url(${selectedColor.backgroundImage}) center/cover no-repeat`
                 : startColor === "#ffffff" && endColor === "#ffffff"
                 ? "white"
                 : `linear-gradient(135deg, ${startColor}, ${endColor})`,
@@ -248,7 +251,7 @@ const AddPostBox = ({ handleClose }) => {
             }}
             className={`w-full px-4 md:px-6 py-4 border-none outline-none text-base md:text-lg placeholder-gray-500 ${
               (startColor !== "#ffffff" && endColor !== "#ffffff") ||
-              selectedColor.image
+              selectedColor.backgroundImage
                 ? "text-white placeholder:text-white/90 font-semibold"
                 : "text-gray-900"
             } ${
@@ -260,7 +263,7 @@ const AddPostBox = ({ handleClose }) => {
 
           {show && (
             <p
-              className="absolute font-bold text-3xl pointer-events-none bg-clip-text text-transparent"
+              className=" absolute font-bold text-3xl pointer-events-none bg-clip-text text-transparent"
               style={{
                 top: "50%",
                 left: "50%",
@@ -305,20 +308,20 @@ const AddPostBox = ({ handleClose }) => {
                 {/* Animated Color Box */}
                 <div
                   ref={colorBoxRef}
-                  className="flex-1 flex items-center justify-center gap-1 md:gap-2 mx-2 overflow-x-auto scrollbar-hide opacity-0 -translate-x-10"
+                  className="flex-1 flex items-center justify-center gap-1 md:gap-2 mx-2 overflow-x-auto gradient-scrollbar overflow-y-hidden opacity-0 -translate-x-10"
                   style={{ display: "none", minHeight: "44px" }}
                 >
                   {colorData.map((item, index) => (
                     <button
                       onClick={() => handleColorSelect(item, index)}
                       key={item.id}
-                      className="flex-shrink-0 h-9 w-9 md:h-10 md:w-10 rounded-lg cursor-pointer border-2 hover:border-blue-500 hover:scale-105 active:scale-95 transition-all"
+                      className="flex-shrink-0 h-9 w-9 md:h-10 md:w-10 rounded-lg cursor-pointer border-2   hover:border-blue-500 hover:scale-105 active:scale-95 transition-all"
                       style={{
                         background:
                           index === 9
                             ? `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
                             : index === 8
-                            ? `url(${item.image}) center/cover no-repeat`
+                            ? `url(${item.backgroundImage}) center/cover no-repeat`
                             : `linear-gradient(135deg, ${item.startColor}, ${item.endColor})`,
                         borderColor:
                           startColor === item.startColor &&
@@ -415,7 +418,7 @@ const AddPostBox = ({ handleClose }) => {
           </div>
 
           {/* Content */}
-          <div className="p-4 md:p-6 h-[calc(90vh-80px)] md:h-[calc(85vh-80px)] overflow-y-auto">
+          <div className="p-4 md:p-6 h-[calc(90vh-80px)] md:h-[calc(85vh-80px)] overflow-y-auto gradient-scrollbar">
             {imageExpo?.map((category) => (
               <div key={category.id} className="mb-8 last:mb-0">
                 {/* Category Header */}

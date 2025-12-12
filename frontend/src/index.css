@@ -11,3 +11,17 @@
 .animate-shimmer {
   animation: shimmer 2s infinite;
 }
+/* === Global Gradient Scrollbar === */
+.gradient-scrollbar::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.gradient-scrollbar::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, #7F00FF, #00B0FF);
+}
+
+.gradient-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #00C9A7, #92FE9D);
+  border-radius: 5px;
+}

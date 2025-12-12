@@ -3,10 +3,13 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import AddPost from "./components/AddPost";
 import GetPost from "./components/GetPost";
+import { useDispatch, useSelector } from "react-redux";
+import { getPosts, postReset } from "../../../features/Post/postSlice";
+
 gsap.registerPlugin(ScrollTrigger);
 
 const SocialProductFeed = () => {
-  const [posts, setPosts] = useState([]);
+  const [showposts, setShowPosts] = useState([]);
   const [comments, setComments] = useState({});
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(true); // Toggle this to see different views
@@ -128,6 +131,8 @@ const SocialProductFeed = () => {
     ],
   };
 
+
+
   // Add post refs
   const addToPostRefs = (el) => {
     if (el && !postRefs.current.includes(el)) {
@@ -145,7 +150,7 @@ const SocialProductFeed = () => {
   useEffect(() => {
     // Simulate data loading
     setTimeout(() => {
-      setPosts(samplePosts);
+      setShowPosts(samplePosts);
       setComments(sampleComments);
       setLoading(false);
     }, 1500);
@@ -232,12 +237,21 @@ const SocialProductFeed = () => {
     });
   }, [loading, isAdmin]);
 
+
+    const dispatch = useDispatch();
+    const { posts, postLoading, postError, postSuccess, postMessage } =
+      useSelector((state) => state.post);
+    useEffect(() => {
+      dispatch(getPosts());
+      dispatch(postReset());
+    }, []);
+
   // const handleCreatePost = (e) => {
   //   e.preventDefault();
   //   if (!newPost.productName || !newPost.description) return;
 
   //   const post = {
-  //     id: posts.length + 1,
+  //     id: showposts.length + 1,
   //     user: {
   //       name: "You",
   //       avatar: "👑",
@@ -255,7 +269,7 @@ const SocialProductFeed = () => {
   //     isShared: false,
   //   };
 
-  //   setPosts([post, ...posts]);
+  //   setShowPosts([post, ...showposts]);
   //   // setNewPost({ image: "", description: "", price: "", productName: "" });
 
   //   // Success animation
@@ -267,8 +281,8 @@ const SocialProductFeed = () => {
   // };
 
   const handleLike = (postId) => {
-    setPosts(
-      posts.map((post) => {
+    setShowPosts(
+      showposts.map((post) => {
         if (post.id === postId) {
           const wasLiked = post.isLiked;
           return {
@@ -283,8 +297,8 @@ const SocialProductFeed = () => {
   };
 
   const handleShare = (postId) => {
-    setPosts(
-      posts.map((post) => {
+    setShowPosts(
+      showposts.map((post) => {
         if (post.id === postId) {
           const wasShared = post.isShared;
           return {
@@ -332,8 +346,8 @@ const SocialProductFeed = () => {
     }));
 
     // Update post comment count
-    setPosts(
-      posts.map((post) => {
+    setShowPosts(
+      showposts.map((post) => {
         if (post.id === postId) {
           return { ...post, comments: post.comments + 1 };
         }
@@ -364,19 +378,28 @@ const SocialProductFeed = () => {
     };
 
     return (
-      <GetPost
-        post={post}
-        showComments={showComments}
-        setShowComments={setShowComments}
-        commentText={commentText}
-        setCommentText={setCommentText}
-        handleCommentSubmit={handleCommentSubmit}
-        addToPostRefs={addToPostRefs}
-        handleLike={handleLike}
-        handleShare={handleShare}
-        addToCommentRefs={addToCommentRefs}
-        comments={comments}
-      />
+      <>
+        {posts?.map((item, index) => {
+          return (
+            <GetPost
+              {...item}
+              key={index}
+              post={post}
+              showComments={showComments}
+              setShowComments={setShowComments}
+              commentText={commentText}
+              setCommentText={setCommentText}
+              handleCommentSubmit={handleCommentSubmit}
+              addToPostRefs={addToPostRefs}
+              handleLike={handleLike}
+              handleShare={handleShare}
+              addToCommentRefs={addToCommentRefs}
+              comments={comments}
+            />
+          );
+          s;
+        })}
+      </>
     );
   };
 
@@ -433,13 +456,13 @@ const SocialProductFeed = () => {
 
         {/* Posts Feed */}
         <div className="space-y-6">
-          {posts.map((post) => (
+          {showposts.map((post) => (
             <Post key={post.id} post={post} />
           ))}
         </div>
 
         {/* Empty State */}
-        {posts.length === 0 && (
+        {showposts.length === 0 && (
           <div className="text-center py-20">
             <div className="text-8xl mb-6">💬</div>
             <h3 className="text-3xl font-black bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">

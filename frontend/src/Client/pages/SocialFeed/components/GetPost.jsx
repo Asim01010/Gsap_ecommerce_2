@@ -1,5 +1,5 @@
 import { User } from "lucide-react";
-import React from "react";
+import { useSelector } from "react-redux";
 
 const GetPost = ({
   post,
@@ -13,7 +13,13 @@ const GetPost = ({
   //   handleShare,
   comments,
   addToCommentRefs,
+  background,
+  // _id,
+  text,
+  // user,
 }) => {
+  const { user } = useSelector((state) => state.register);
+
   return (
     <div
       ref={addToPostRefs}
@@ -27,7 +33,9 @@ const GetPost = ({
           </div>
           <div className="flex-grow">
             <div className="flex items-center space-x-2">
-              <h4 className="font-bold text-gray-800">User</h4>
+              <h4 className="font-bold text-gray-800">
+                {user?.firstName} {user?.lastName}
+              </h4>
               {post.user.verified && (
                 <span className="text-blue-500" title="Verified">
                   ✓
@@ -44,19 +52,20 @@ const GetPost = ({
 
       {/* Post Content */}
       <div className="p-6">
-        <p className="text-gray-800 mb-4 text-lg">
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Corporis
-          accusamus laboriosam laudantium commodi itaque, iure iste et dolorum
-          quis consectetur?
-        </p>
+        <p className="text-gray-800 mb-4 text-lg">{text}</p>
 
         {/* Product Card */}
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-4 mb-4 interactive">
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-200 to-blue-200 rounded-2xl flex items-center justify-center text-2xl">
-              {post.product.image}
-            </div>
-          </div>
+        <div className="bg-gradient-to-br from-purple-50 h-[500px] to-blue-50 rounded-2xl p-4 mb-4 interactive">
+          <div
+            className="flex items-center space-x-4 h-full w-full"
+            style={{
+              backgroundImage: background?.backgroundImage
+                ? `url(${background.backgroundImage})`
+                : `linear-gradient(${background.startColor}, ${background.endColor})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          ></div>
         </div>
       </div>
 

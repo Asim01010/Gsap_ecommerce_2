@@ -204,7 +204,7 @@ const Navbar = () => {
       {/* Navbar */}
       <nav
         ref={navbarRef}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500  ${
           scrolled
             ? "bg-white/95 backdrop-blur-xl shadow-2xl border-b border-white/20"
             : "bg-white/80 backdrop-blur-lg shadow-lg"
@@ -323,7 +323,7 @@ const Navbar = () => {
 
       {/* Mobile Search Overlay */}
       {isSearchOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden flex items-start justify-center pt-32 px-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden flex items-start justify-center pt-32 px-4 ">
           <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 w-full max-w-md shadow-2xl border border-white/20">
             <form onSubmit={handleSearchSubmit} className="space-y-4">
               <div className="flex items-center justify-between mb-4">
@@ -373,11 +373,11 @@ const Navbar = () => {
       {isMenuOpen && (
         <div
           ref={mobileMenuRef}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden "
         >
-          <div className="absolute top-0 right-0 h-full w-80 bg-white/95 backdrop-blur-xl shadow-2xl border-l border-white/20 overflow-y-auto">
+          <div className="absolute top-0 right-0 h-full w-80 bg-white/95 backdrop-blur-xl shadow-2xl border-l border-white/20 overflow-y-auto gradient-scrollbar">
             {/* Mobile Menu Header */}
-            <div className="p-6 border-b border-gray-200">
+            <div className="p-6 pt-20 border-b border-gray-200">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
                   <span className="text-white font-bold text-xl">S</span>
@@ -386,7 +386,9 @@ const Navbar = () => {
                   <div className="text-xl font-black bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                     ShopHub
                   </div>
-                  <div className="text-sm text-gray-500">Welcome back!</div>
+                  <div className="text-sm text-gray-500">
+                    {user?.firstName} {user?.lastName}
+                  </div>
                 </div>
               </div>
 

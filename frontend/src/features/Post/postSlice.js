@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { addPost } from "./postService";
+import { addPost, getAllPosts } from "./postService";
 
 const initialState = {
   posts: [],
@@ -8,7 +8,7 @@ const initialState = {
   postSuccess: false,
   postMessage: "",
 };
-
+// send post data to backend
 export const createPost = createAsyncThunk(
   "posts/createPost",
   async (postData, thunkAPI) => {
@@ -20,7 +20,18 @@ export const createPost = createAsyncThunk(
     }
   }
 );
-
+// get all posts from backend
+export const getPosts = createAsyncThunk(
+  "posts/getPosts",
+  async (_, thunkAPI) => {
+    try {
+      const res = await getAllPosts();
+      return res;
+    } catch (error) {
+      thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
 export const postSlice = createSlice({
   name: "posts",
   initialState,
@@ -44,6 +55,19 @@ export const postSlice = createSlice({
       state.posts.push(action.payload);
     });
     builder.addCase(createPost.rejected, (state, action) => {
+      state.postLoading = false;
+      state.postError = true;
+      state.postMessage = action.payload;
+    });
+    builder.addCase(getPosts.pending, (state) => {
+      state.postLoading = true;
+    });
+    builder.addCase(getPosts.fulfilled, (state, action) => {
+      state.postLoading = false;
+      state.postSuccess = true;
+      state.posts = action.payload;
+    });
+    builder.addCase(getPosts.rejected, (state, action) => {
       state.postLoading = false;
       state.postError = true;
       state.postMessage = action.payload;
