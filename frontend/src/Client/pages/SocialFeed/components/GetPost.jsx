@@ -1,6 +1,6 @@
 import { User } from "lucide-react";
 import { useSelector } from "react-redux";
-
+import moment from "moment";
 const GetPost = ({
   post,
   showComments,
@@ -17,6 +17,7 @@ const GetPost = ({
   // _id,
   text,
   // user,
+  createdAt,
 }) => {
   const { user } = useSelector((state) => state.register);
 
@@ -45,7 +46,7 @@ const GetPost = ({
                 admin
               </span>
             </div>
-            <p className="text-sm text-gray-500">5 hours</p>
+            <p className="text-sm text-gray-500">{moment(createdAt).fromNow()}</p>
           </div>
         </div>
       </div>

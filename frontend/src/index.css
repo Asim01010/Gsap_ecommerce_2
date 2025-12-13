@@ -13,15 +13,15 @@
 }
 /* === Global Gradient Scrollbar === */
 .gradient-scrollbar::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
 }
 
 .gradient-scrollbar::-webkit-scrollbar-track {
-  background: linear-gradient(135deg, #7F00FF, #00B0FF);
+  background: rgb(204, 227, 235);
 }
 
 .gradient-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #00C9A7, #92FE9D);
+  background: lightblue;
   border-radius: 5px;
 }

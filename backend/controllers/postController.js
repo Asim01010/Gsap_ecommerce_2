@@ -40,6 +40,6 @@ export const addPost = async (req, res) => {
 };
 
 export const getPosts = async (req, res) => {
-  const allPosts = await Posts.find();
+  const allPosts = await Posts.find().sort({ createdAt: -1 });
   res.status(200).json(allPosts);
 };

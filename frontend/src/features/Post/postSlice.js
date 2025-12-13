@@ -52,7 +52,7 @@ export const postSlice = createSlice({
       console.log("FULFILLED PAYLOAD:", action.payload.newPost);
       state.postLoading = false;
       state.postSuccess = true;
-      state.posts.push(action.payload);
+      state.posts.unshift(action.payload);
     });
     builder.addCase(createPost.rejected, (state, action) => {
       state.postLoading = false;
@@ -64,7 +64,7 @@ export const postSlice = createSlice({
     });
     builder.addCase(getPosts.fulfilled, (state, action) => {
       state.postLoading = false;
-      state.postSuccess = true;
+      // state.postSuccess = true;
       state.posts = action.payload;
     });
     builder.addCase(getPosts.rejected, (state, action) => {

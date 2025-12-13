@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ArrowLeft, ChevronLeft, Smile, User, X } from "lucide-react";
+import { ArrowLeft, ChevronLeft, Ellipsis, FileImage, Image, Laugh, MapPin, Smile, User, UserPen, X } from "lucide-react";
 import { colorData } from "../data/color-data";
 import gsap from "gsap";
 import { imageExpo } from "../data/decorative";
@@ -7,6 +7,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { createPost, postReset } from "../../../../features/Post/postSlice";
 import CircularProgress from "@mui/material/CircularProgress";
 import { toast } from "react-hot-toast";
+import axios from "axios";
+
 const AddPostBox = ({ handleClose }) => {
   const [openColor, setOpenColor] = useState(false);
   const [showBackgroundModal, setShowBackgroundModal] = useState(false);
@@ -21,10 +23,13 @@ const AddPostBox = ({ handleClose }) => {
   const { startColor, endColor } = selectedColor;
   const [text, setText] = useState("");
   const [show, setShow] = useState(true);
-
+  const[imagePreview,setImagePreview] = useState(null);
   const colorBoxRef = useRef(null);
   const backgroundModalRef = useRef(null);
   const postBoxRef = useRef(null);
+  const [mediaFile, setMediaFile] = useState(false);
+  const [mediaSelected,setMediaSelected]=useState(false);
+  const [imageFile, setImageFile] = useState(null);
 
   // Animation for color box
   useEffect(() => {
@@ -145,30 +150,31 @@ const AddPostBox = ({ handleClose }) => {
   };
   // const dispatch = useDispatch();
   const { user } = useSelector((state) => state.register);
-  const { posts, postLoading, postError, postSuccess, postMessage } =
+  const { postLoading, postError, postSuccess, postMessage } =
     useSelector((state) => state.post);
   const dispatch = useDispatch();
-  const handlePostUpload = (e) => {
-    e.preventDefault();
+ const handlePostUpload = (e) => {
+   e.preventDefault();
 
-    const postData = {
-      text: text,
-      background: {
-        startColor: selectedColor.startColor,
-        endColor: selectedColor.endColor,
-        backgroundImage: selectedColor.backgroundImage,
-      },
-      user_id: user?._id,
-    };
+   if (!text.trim() && !mediaFile) {
+     toast.error("Add text or media to post");
+     return;
+   }
 
-    dispatch(createPost(postData));
-    console.log("POST DATA:", postData);
+  //  const postData = {
+  //    text,
+  //    background: {
+  //      startColor: selectedColor.startColor,
+  //      endColor: selectedColor.endColor,
+  //      backgroundImage: selectedColor.backgroundImage,
+  //    },
+  //    user_id: user?._id,
+  //  };
 
-    // Example: send to backend (Node/MongoDB)
-    // axios.post("/api/post/create", postData)
-    //   .then(res => console.log("Post saved"))
-    //   .catch(err => console.log(err));
-  };
+  //  dispatch(createPost(postData));
+  uploadImage();
+ };
+
   useEffect(() => {
     if (postError) {
       toast.error(postMessage);
@@ -189,6 +195,28 @@ const AddPostBox = ({ handleClose }) => {
       dispatch(postReset());
     };
   }, [postError, postSuccess, postMessage, dispatch]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    const image_url = URL.createObjectURL(file);
+  setImagePreview(image_url);
+setImageFile(file);
+    setMediaSelected(true);
+    setMediaFile(file);
+    setShow(false);
+  };
+const canPost = text.trim().length > 0 || mediaFile;
+
+const uploadImage = async ()=>{
+  // username : dxfieyp9g
+  // password : qw4hddqcrg
+
+  const  data = new FormData();
+  data.append("file",imageFile);
+  data.append("upload_preset", "qw4hddqcrg");
+const response = await axios.post("https://api.cloudinary.com/v1_1/dxfieyp9g/image/upload",data);
+console.log(response.data.url)
+}
 
   return (
     <>
@@ -217,7 +245,9 @@ const AddPostBox = ({ handleClose }) => {
               <User className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <span className="font-semibold text-gray-900">Muhammad Asim</span>
+              <span className="font-semibold text-gray-900">
+                {user?.firstName} {user?.lastName}
+              </span>
               <div className="flex gap-1 mt-1">
                 <div className="px-3 py-1 text-xs rounded-full border border-gray-300 bg-white text-gray-700">
                   Friends
@@ -225,55 +255,123 @@ const AddPostBox = ({ handleClose }) => {
               </div>
             </div>
           </div>
+          <div className="relative">
+            {/* Textarea */}
+            <textarea
+              value={text}
+              onChange={(e) => {
+                const value = e.target.value;
+                setText(value);
 
-          {/* Textarea */}
-          <textarea
-            value={text}
-            onChange={(e) => {
-              const value = e.target.value;
-              setText(value);
-
-              if (value.length > 0) {
-                setShow(false); // hide placeholder message
-              } else {
-                setShow(true); // show placeholder message
-              }
-            }}
-            style={{
-              resize: "none",
-              width: "100%",
-              background: selectedColor.backgroundImage
-                ? `url(${selectedColor.backgroundImage}) center/cover no-repeat`
-                : startColor === "#ffffff" && endColor === "#ffffff"
-                ? "white"
-                : `linear-gradient(135deg, ${startColor}, ${endColor})`,
-              transition: "all 0.3s ease",
-            }}
-            className={`w-full px-4 md:px-6 py-4 border-none outline-none text-base md:text-lg placeholder-gray-500 ${
-              (startColor !== "#ffffff" && endColor !== "#ffffff") ||
-              selectedColor.backgroundImage
-                ? "text-white placeholder:text-white/90 font-semibold"
-                : "text-gray-900"
-            } ${
-              changeRow
-                ? "min-h-[250px] md:min-h-[320px]"
-                : "min-h-[150px] md:min-h-[180px]"
-            } transition-all duration-300`}
-          />
-
-          {show && (
-            <p
-              className=" absolute font-bold text-3xl pointer-events-none bg-clip-text text-transparent"
-              style={{
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                whiteSpace: "nowrap",
-                backgroundImage: `linear-gradient(135deg, purple, blue)`,
+                if (value.length > 0) {
+                  setShow(false); // hide placeholder message
+                } else {
+                  setShow(true); // show placeholder message
+                }
               }}
-            >
-              What's on your mind {user?.lastName || "User"}?
-            </p>
+              style={{
+                resize: "none",
+                width: "100%",
+                background: selectedColor.backgroundImage
+                  ? `url(${selectedColor.backgroundImage}) center/cover no-repeat`
+                  : startColor === "#ffffff" && endColor === "#ffffff"
+                  ? "white"
+                  : `linear-gradient(135deg, ${startColor}, ${endColor})`,
+                transition: "all 0.3s ease",
+              }}
+              className={`w-full px-4 md:px-6 py-4 border-none outline-none text-base md:text-lg placeholder-gray-500 ${
+                (startColor !== "#ffffff" && endColor !== "#ffffff") ||
+                selectedColor.backgroundImage
+                  ? "text-white placeholder:text-white/90 font-semibold"
+                  : "text-gray-900"
+              } ${
+                mediaFile
+                  ? "min-h-[50px]"
+                  : changeRow
+                  ? "min-h-[250px] md:min-h-[320px]"
+                  : "min-h-[150px] md:min-h-[180px]"
+              }
+ transition-all duration-300`}
+            />
+
+            {show && (
+              <p
+                className={`absolute font-bold ${
+                  mediaFile ? "text-xl" : "text-3xl"
+                } pointer-events-none bg-clip-text text-transparent`}
+                style={{
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  whiteSpace: "nowrap",
+                  backgroundImage: `linear-gradient(135deg, purple, blue)`,
+                }}
+              >
+                What's on your mind {user?.lastName || "User"}?
+              </p>
+            )}
+          </div>
+          {mediaFile && (
+            <label htmlFor="mediaFileInput" className="block">
+              <div className="relative p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-300 hover:border-purple-400 transition-all duration-300">
+                {/* Close Button */}
+                <div
+                  onClick={() => {
+                    setMediaFile(false);
+                    setMediaSelected(false);
+                  }}
+                  className="absolute z-10 top-3 right-3 p-1 rounded-full bg-white shadow hover:bg-gray-100 cursor-pointer transition-all active:scale-95"
+                >
+                  <X size={18} />
+                </div>
+
+                {/* Hidden Input */}
+                <input
+                  type="file"
+                  id="mediaFileInput"
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+
+                {/* Upload Area */}
+                {mediaSelected ? (
+                  <div className="flex items-start justify-center w-full max-h-[350px] overflow-y-auto gradient-scrollbar">
+                    <img
+                      src={imagePreview}
+                      alt="Selected media"
+                      className="max-w-full h-auto rounded-xl"
+                      style={{
+                        maxHeight: "none", // Remove any height limit
+                        objectFit: "contain",
+                        display: "block",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center gap-3 w-full h-[350px] text-center cursor-pointer group">
+                    {/* Icon */}
+                    <div className="p-4 rounded-full bg-purple-50 text-purple-600 group-hover:bg-purple-100 transition">
+                      <Image size={40} />
+                    </div>
+
+                    {/* Text */}
+                    <div className="space-y-1">
+                      <p className="text-base font-semibold text-gray-800">
+                        Add Media
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Click to upload image or video
+                      </p>
+                    </div>
+
+                    {/* Hint */}
+                    <span className="text-xs text-gray-400">
+                      PNG, JPG, MP4 up to 10MB
+                    </span>
+                  </div>
+                )}
+              </div>
+            </label>
           )}
 
           {/* Footer */}
@@ -347,15 +445,44 @@ const AddPostBox = ({ handleClose }) => {
                   <Smile className="w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-500 transition-colors" />
                 </div>
               </div>
+              {/* AddMediaBox */}
+
+              {/* AddMediaBox */}
+              <div className="flex items-center justify-between p-2 rounded-2xl border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition-all ">
+                Add Media here
+                <span className="ml-2 text-sm font-medium text-gray-700 hidden sm:block">
+                  <div className="flex items-center justify-between">
+                    <span
+                      onClick={() => setMediaFile(true)}
+                      className="mr-2 text-green-500 h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 cursor-pointer"
+                    >
+                      <FileImage />
+                    </span>
+
+                    <span className="mr-2 text-blue-500 h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 cursor-pointer">
+                      <UserPen />
+                    </span>
+                    <span className="mr-2 text-yellow-500 h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 cursor-pointer">
+                      <Laugh />
+                    </span>
+                    <span className="mr-2 text-red-500 h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 cursor-pointer">
+                      <MapPin />
+                    </span>
+                    <span className="mr-2 text-gray-500 h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 cursor-pointer">
+                      <Ellipsis />
+                    </span>
+                  </div>
+                </span>
+              </div>
 
               {/* Bottom row: Post button */}
 
               <button
                 onClick={handlePostUpload}
-                disabled={text.length === 0}
+                disabled={!canPost}
                 className={`w-full block md:w-auto px-6 py-3 font-semibold rounded-xl shadow-lg active:scale-95 transition-all duration-200
     ${
-      text.length === 0
+      !canPost
         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
         : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
     }

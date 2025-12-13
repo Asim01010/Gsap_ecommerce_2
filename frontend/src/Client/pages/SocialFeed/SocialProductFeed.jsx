@@ -397,7 +397,7 @@ const SocialProductFeed = () => {
               comments={comments}
             />
           );
-          s;
+          
         })}
       </>
     );
