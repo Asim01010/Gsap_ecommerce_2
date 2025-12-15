@@ -4,7 +4,7 @@ const postSchema = mongoose.Schema(
   {
     text: {
       type: String,
-      required: true,
+      default: "",
     },
 
     background: {
@@ -24,6 +24,12 @@ const postSchema = mongoose.Schema(
         default: "",
       },
     },
+
+    image: {
+      type: String,
+      default: "",
+    },
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Register",
@@ -34,5 +40,13 @@ const postSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Custom validator to ensure at least text or image exists
+postSchema.pre("validate", function (next) {
+  if (!this.text && !this.image) {
+    this.invalidate("text", "Post must have text or an image");
+  }
+  next();
+});
 
 export const Posts = mongoose.model("Post", postSchema);

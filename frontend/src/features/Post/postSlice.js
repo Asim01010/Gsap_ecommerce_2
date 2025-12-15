@@ -16,7 +16,9 @@ export const createPost = createAsyncThunk(
       const res = await addPost(postData);
       return res;
     } catch (error) {
-      thunkAPI.rejectWithValue(error.message);
+       return thunkAPI.rejectWithValue(
+         error.response?.data?.message || error.message
+       );
     }
   }
 );
@@ -28,7 +30,9 @@ export const getPosts = createAsyncThunk(
       const res = await getAllPosts();
       return res;
     } catch (error) {
-      thunkAPI.rejectWithValue(error.message);
+       return thunkAPI.rejectWithValue(
+         error.response?.data?.message || error.message
+       );
     }
   }
 );
@@ -37,7 +41,7 @@ export const postSlice = createSlice({
   initialState,
   reducers: {
     postReset: (state) => {
-      state.posts = [];
+     
       state.postLoading = false;
       state.postError = false;
       state.postSuccess = false;
@@ -52,7 +56,7 @@ export const postSlice = createSlice({
       console.log("FULFILLED PAYLOAD:", action.payload.newPost);
       state.postLoading = false;
       state.postSuccess = true;
-      state.posts.unshift(action.payload);
+      state.posts.unshift(action.payload.newPost);
     });
     builder.addCase(createPost.rejected, (state, action) => {
       state.postLoading = false;

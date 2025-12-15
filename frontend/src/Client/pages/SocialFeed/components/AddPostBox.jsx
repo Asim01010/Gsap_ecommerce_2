@@ -30,6 +30,8 @@ const AddPostBox = ({ handleClose }) => {
   const [mediaFile, setMediaFile] = useState(false);
   const [mediaSelected,setMediaSelected]=useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const [imageLoading,setImageLoading] = useState(false);
+  
 
   // Animation for color box
   useEffect(() => {
@@ -153,7 +155,7 @@ const AddPostBox = ({ handleClose }) => {
   const { postLoading, postError, postSuccess, postMessage } =
     useSelector((state) => state.post);
   const dispatch = useDispatch();
- const handlePostUpload = (e) => {
+ const handlePostUpload = async (e) => {
    e.preventDefault();
 
    if (!text.trim() && !mediaFile) {
@@ -161,62 +163,77 @@ const AddPostBox = ({ handleClose }) => {
      return;
    }
 
-  //  const postData = {
-  //    text,
-  //    background: {
-  //      startColor: selectedColor.startColor,
-  //      endColor: selectedColor.endColor,
-  //      backgroundImage: selectedColor.backgroundImage,
-  //    },
-  //    user_id: user?._id,
-  //  };
+let imageUrl = "";
 
-  //  dispatch(createPost(postData));
-  uploadImage();
+if (imageFile) {
+  imageUrl = await uploadImage();
+}
+
+   const postData = {
+     text,
+     background: selectedColor,
+     user_id: user?._id,
+     image: imageUrl,
+   };
+
+   dispatch(createPost(postData));
+
  };
 
-  useEffect(() => {
-    if (postError) {
-      toast.error(postMessage);
-    }
-    if (postSuccess) {
-      toast.success("Post created successfully!");
-      setText("");
-      setSelectedColor({
-        startColor: "#ffffff",
-        endColor: "#ffffff",
-        backgroundImage: "",
-      });
-      setChangeRow(false);
-      handleClose();
-    }
+ useEffect(() => {
+   if (postError) toast.error(postMessage);
 
-    return () => {
-      dispatch(postReset());
-    };
-  }, [postError, postSuccess, postMessage, dispatch]);
+   if (postSuccess) {
+     toast.success("Post created successfully!");
+     setText("");
+     setSelectedColor({
+       startColor: "#ffffff",
+       endColor: "#ffffff",
+       backgroundImage: "",
+     });
+     setChangeRow(false);
+     handleClose();
+   }
+
+   return () => dispatch(postReset());
+ }, [postError, postSuccess]);
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     const image_url = URL.createObjectURL(file);
-  setImagePreview(image_url);
-setImageFile(file);
+    setImagePreview(image_url);
+    setImageFile(file);
     setMediaSelected(true);
     setMediaFile(file);
     setShow(false);
   };
 const canPost = text.trim().length > 0 || mediaFile;
 
-const uploadImage = async ()=>{
-  // username : dxfieyp9g
-  // password : qw4hddqcrg
+const uploadImage = async () => {
+  try {
+    setImageLoading(true);
 
-  const  data = new FormData();
-  data.append("file",imageFile);
-  data.append("upload_preset", "qw4hddqcrg");
-const response = await axios.post("https://api.cloudinary.com/v1_1/dxfieyp9g/image/upload",data);
-console.log(response.data.url)
-}
+    const data = new FormData();
+    data.append("file", imageFile);
+    data.append("upload_preset", "qw4hddqcrg");
+    data.append("cloud_name", "dxfieyp9g");
+
+    const response = await axios.post(
+      "https://api.cloudinary.com/v1_1/dxfieyp9g/image/upload",
+      data
+    );
+
+    return response.data.secure_url;
+  } catch (error) {
+    console.error("Cloudinary Error:", error);
+    toast.error("Image upload failed");
+    return "";
+  } finally {
+    setImageLoading(false);
+  }
+};
+
 
   return (
     <>
@@ -449,8 +466,8 @@ console.log(response.data.url)
 
               {/* AddMediaBox */}
               <div className="flex items-center justify-between p-2 rounded-2xl border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition-all ">
-                Add Media here
-                <span className="ml-2 text-sm font-medium text-gray-700 hidden sm:block">
+              <span>Select Files</span>
+                <span className="ml-2 text-sm font-medium text-gray-700 ">
                   <div className="flex items-center justify-between">
                     <span
                       onClick={() => setMediaFile(true)}
@@ -479,7 +496,7 @@ console.log(response.data.url)
 
               <button
                 onClick={handlePostUpload}
-                disabled={!canPost}
+                disabled={!canPost || imageLoading}
                 className={`w-full block md:w-auto px-6 py-3 font-semibold rounded-xl shadow-lg active:scale-95 transition-all duration-200
     ${
       !canPost
@@ -488,7 +505,7 @@ console.log(response.data.url)
     }
   `}
               >
-                {postLoading ? (
+                {postLoading || imageLoading ? (
                   <>
                     <svg width={0} height={0}>
                       <defs>

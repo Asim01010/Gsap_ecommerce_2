@@ -2,16 +2,17 @@ import { Posts } from "../models/postModel.js";
 
 export const addPost = async (req, res) => {
   try {
-    const { text, background } = req.body;
+    const { text, background,image } = req.body;
     const { user_id } = req.params;
 
     // Validate text
-    if (!text) {
-      return res.status(400).json({
-        success: false,
-        message: "text is required",
-      });
-    }
+ if (!text && !image && !background?.backgroundImage) {
+   return res.status(400).json({
+     success: false,
+     message: "Post content is required",
+   });
+ }
+
 
     // Create Post
     const newPost = await Posts.create({
@@ -22,6 +23,7 @@ export const addPost = async (req, res) => {
         backgroundImage: background?.backgroundImage || "",
       },
       user: user_id,
+      image,
     });
 
     // Return FULL post object
@@ -40,6 +42,8 @@ export const addPost = async (req, res) => {
 };
 
 export const getPosts = async (req, res) => {
-  const allPosts = await Posts.find().sort({ createdAt: -1 });
+  const allPosts = await Posts.find()
+    .populate("user", "firstName lastName verified")
+    .sort({ createdAt: -1 });
   res.status(200).json(allPosts);
 };

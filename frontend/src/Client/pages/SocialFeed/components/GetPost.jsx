@@ -1,90 +1,105 @@
+import React, { useState } from "react";
 import { User } from "lucide-react";
-import { useSelector } from "react-redux";
 import moment from "moment";
+
 const GetPost = ({
   post,
-  showComments,
-  //   setShowComments,
-  commentText,
-  setCommentText,
-  handleCommentSubmit,
   addToPostRefs,
-  //   handleLike,
-  //   handleShare,
-  comments,
   addToCommentRefs,
-  background,
-  // _id,
-  text,
-  // user,
-  createdAt,
+  comments,
+  handleLike,
+  handleAddComment,
 }) => {
-  const { user } = useSelector((state) => state.register);
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState("");
+
+  const handleCommentSubmit = (e) => {
+    e.preventDefault();
+    handleAddComment(post._id, commentText);
+    setCommentText("");
+  };
 
   return (
     <div
-      ref={addToPostRefs}
+      ref={(el) => addToPostRefs(el)}
       className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-white/20 interactive group mb-8"
     >
       {/* Post Header */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center text-white text-xl">
-            <User />
-          </div>
-          <div className="flex-grow">
-            <div className="flex items-center space-x-2">
-              <h4 className="font-bold text-gray-800">
-                {user?.firstName} {user?.lastName}
-              </h4>
-              {post.user.verified && (
-                <span className="text-blue-500" title="Verified">
-                  ✓
-                </span>
-              )}
-              <span className="px-2 py-1 bg-purple-100 text-purple-600 text-xs font-bold rounded-full">
-                admin
-              </span>
-            </div>
-            <p className="text-sm text-gray-500">{moment(createdAt).fromNow()}</p>
-          </div>
+      <div className="p-6 border-b border-gray-200 flex items-center space-x-3">
+        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center text-white text-xl">
+          <User />
+        </div>
+        <div className="flex-grow">
+          <h4 className="font-bold text-gray-800">
+            {post.user?.firstName} {post.user?.lastName}
+          </h4>
+          <p className="text-sm text-gray-500">
+            {moment(post.createdAt).fromNow()}
+          </p>
         </div>
       </div>
 
       {/* Post Content */}
-      <div className="p-6">
-        <p className="text-gray-800 mb-4 text-lg">{text}</p>
 
-        {/* Product Card */}
-        <div className="bg-gradient-to-br from-purple-50 h-[500px] to-blue-50 rounded-2xl p-4 mb-4 interactive">
-          <div
-            className="flex items-center space-x-4 h-full w-full"
-            style={{
-              backgroundImage: background?.backgroundImage
-                ? `url(${background.backgroundImage})`
-                : `linear-gradient(${background.startColor}, ${background.endColor})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          ></div>
+      <div className="w-full rounded-2xl overflow-hidden bg-white shadow-md">
+        {/* CASE 1 & 2 & 5 → BACKGROUND */}
+        {post.background &&
+          (post.background.backgroundImage ||
+            (post.background.startColor !== "#ffffff" &&
+              post.background.endColor !== "#ffffff")) && (
+            <div
+              className={`relative w-full flex items-center justify-center text-center ${
+                post.image ? "py-6" : "min-h-[280px]"
+              }`}
+              style={{
+                background: post.background.backgroundImage
+                  ? `url(${post.background.backgroundImage}) center/cover no-repeat`
+                  : `linear-gradient(135deg, ${post.background.startColor}, ${post.background.endColor})`,
+              }}
+            >
+              {post.text && (
+                <p className="text-white text-2xl md:text-3xl font-bold px-6">
+                  {post.text}
+                </p>
+              )}
+            </div>
+          )}
+
+        {/* CASE 1 & 4 → TEXT ONLY (NO BACKGROUND) */}
+        {post.text &&
+          (!post.background ||
+            (post.background.startColor === "#ffffff" &&
+              !post.background.backgroundImage)) && (
+            <p className="px-4 py-3 text-lg text-gray-900 font-medium">
+              {post.text}
+            </p>
+          )}
+
+        {/* CASE 3 & 4 & 5 → IMAGE */}
+        {post.image && (
+          <img
+            src={post.image}
+            alt="Post media"
+            className="w-full max-h-[650px] object-cover"
+          />
+        )}
+      </div>
+
+    
+
+      {/* Engagement */}
+      <div className="px-6 py-3 border-t border-b border-gray-200 flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center space-x-4">
+          <span>{post.likes || 0} likes</span>
+          <span>{comments[post._id]?.length || 0} comments</span>
+          <span>{post.shares || 0} shares</span>
         </div>
       </div>
 
-      {/* Engagement Stats */}
-      {/* <div className="px-6 py-3 border-t border-b border-gray-200">
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <div className="flex items-center space-x-4">
-            <span>{post.likes} likes</span>
-            <span>{post.comments} comments</span>
-            <span>{post.shares} shares</span>
-          </div>
-        </div>
-      </div> */}
-
-      {/* Action Buttons */}
-      {/* <div className="p-4 grid grid-cols-3 gap-2">
+      {/* Actions */}
+      <div className="p-4 grid grid-cols-3 gap-2">
         <button
-          onClick={() => handleLike(post.id)}
+          onClick={() => handleLike(post._id)}
           className={`flex items-center justify-center space-x-2 py-3 rounded-xl transition-all duration-200 interactive like-button ${
             post.isLiked
               ? "bg-red-50 text-red-600"
@@ -103,49 +118,33 @@ const GetPost = ({
           <span className="font-semibold">Comment</span>
         </button>
 
-        <button
-          onClick={() => handleShare(post.id)}
-          className={`flex items-center justify-center space-x-2 py-3 rounded-xl transition-all duration-200 interactive ${
-            post.isShared
-              ? "bg-green-50 text-green-600"
-              : "hover:bg-gray-100 text-gray-600"
-          }`}
-        >
+        <button className="flex items-center justify-center space-x-2 py-3 rounded-xl hover:bg-gray-100 text-gray-600 transition-all duration-200 interactive">
           <span className="text-xl">🔄</span>
           <span className="font-semibold">Share</span>
         </button>
-      </div> */}
+      </div>
 
-      {/* Comments Section */}
+      {/* Comments */}
       {showComments && (
         <div className="border-t border-gray-200 p-6">
-          {/* Add Comment */}
-          <form onSubmit={handleCommentSubmit} className="mb-6">
-            <div className="flex space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                👤
-              </div>
-              <div className="flex-grow">
-                <input
-                  type="text"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all duration-200"
-                  placeholder="Write a comment..."
-                />
-              </div>
-              <button
-                type="submit"
-                className="px-4 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors duration-200 interactive"
-              >
-                Post
-              </button>
-            </div>
+          <form onSubmit={handleCommentSubmit} className="mb-6 flex space-x-3">
+            <input
+              type="text"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              className="flex-grow px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all duration-200"
+              placeholder="Write a comment..."
+            />
+            <button
+              type="submit"
+              className="px-4 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors duration-200"
+            >
+              Post
+            </button>
           </form>
 
-          {/* Comments List */}
-          <div id={`comments-${post.id}`} className="space-y-4">
-            {(comments[post.id] || []).map((comment) => (
+          <div id={`comments-${post._id}`} className="space-y-4">
+            {(comments[post._id] || []).map((comment) => (
               <div
                 key={comment.id}
                 ref={addToCommentRefs}
@@ -165,14 +164,6 @@ const GetPost = ({
                       </span>
                     </div>
                     <p className="text-gray-700">{comment.text}</p>
-                  </div>
-                  <div className="flex items-center space-x-4 mt-2 px-2">
-                    <button className="text-sm text-gray-500 hover:text-gray-700 interactive">
-                      Like ({comment.likes})
-                    </button>
-                    <button className="text-sm text-gray-500 hover:text-gray-700 interactive">
-                      Reply
-                    </button>
                   </div>
                 </div>
               </div>
