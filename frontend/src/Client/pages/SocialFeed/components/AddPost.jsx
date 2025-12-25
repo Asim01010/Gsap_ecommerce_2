@@ -168,7 +168,7 @@ export default function AddPost() {
   return (
     <div
       ref={containerRef}
-      className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-xl border border-gray-200 p-6 mb-6 backdrop-blur-sm bg-opacity-90"
+      className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-xl border border-gray-200 p-6 mb-6 backdrop-blur-sm bg-opacity-90 overflow-y-scroll"
     >
       {/* Header with Avatar */}
       <div className="flex items-center gap-4 mb-6">
@@ -338,7 +338,7 @@ export default function AddPost() {
             border: "none",
           }}
         >
-          <AddPostBox handleClose={handleClose} />
+          <AddPostBox  handleClose={handleClose} />
         </div>
       </Modal>
     </div>

@@ -73,13 +73,6 @@ useEffect(() => {
 }, [loading]);
 
 
-  // Like handler (frontend only)
-  const handleLike = (postId) => {
-    dispatch({
-      type: "post/updateLikeFrontend",
-      payload: postId,
-    });
-  };
 
   // Comment handler (frontend only)
   const handleAddComment = (postId, commentText) => {
@@ -143,7 +136,7 @@ useEffect(() => {
               addToPostRefs={addToPostRefs}
               addToCommentRefs={addToCommentRefs}
               comments={comments}
-              handleLike={handleLike}
+             
               handleAddComment={handleAddComment}
             />
           ))

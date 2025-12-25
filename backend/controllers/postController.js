@@ -47,3 +47,57 @@ export const getPosts = async (req, res) => {
     .sort({ createdAt: -1 });
   res.status(200).json(allPosts);
 };
+
+export const reactToPost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { reaction } = req.body;
+    const userId = "6937b33dfab028efccd027bb";
+
+    const post = await Posts.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    const existingReaction = post.userReactions.find(
+      (r) => r.user.toString() === userId
+    );
+
+    if (existingReaction) {
+      if (existingReaction.reaction === reaction) {
+        post.reactions[reaction] -= 1;
+        post.userReactions = post.userReactions.filter(
+          (r) => r.user.toString() !== userId
+        );
+      } else {
+        post.reactions[existingReaction.reaction] -= 1;
+        post.reactions[reaction] += 1;
+        existingReaction.reaction = reaction;
+      }
+    } else {
+      post.reactions[reaction] += 1;
+      post.userReactions.push({
+        user: userId,
+        reaction,
+      });
+    }
+
+    await post.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Reaction updated",
+      post,
+    });
+  } catch (error) {
+    console.error("React Post Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};

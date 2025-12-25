@@ -176,6 +176,10 @@ if (imageFile) {
      image: imageUrl,
    };
 
+   console.log("USER FROM REDUX:", user);
+   console.log("USER ID:", user?._id);
+
+
    dispatch(createPost(postData));
 
  };
